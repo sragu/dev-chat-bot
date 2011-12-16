@@ -18,8 +18,21 @@ String.prototype.endsWith = function(suffix) {
     return this.indexOf(suffix, this.length - suffix.length) !== -1;
 };
 
+String.prototype.startsWith = function(prefix) {
+    return this.indexOf(prefix) == 0;
+};
+
 function chat_message(msg) {
     return msg.getChild('body').children[0];
+}
+
+function send_message(msg) {
+    conn.send(new xmpp.Element('message', {
+        to: room_jid,
+        type: 'groupchat'
+    }).
+    c('body').t(msg)
+    );
 }
 
 conn.on('online',
@@ -41,12 +54,7 @@ function() {
     );
 
     // bot says hello to the chat room.
-    conn.send(new xmpp.Element('message', {
-        to: room_jid,
-        type: 'groupchat'
-    }).
-    c('body').t('Hey, devs...')
-    );
+    send_message('Hey, devs...');
 });
 
 // bind to the stanza event stream, and respond only for message stanzas
@@ -55,7 +63,12 @@ function(stanza) {
     if (stanza.is('message')
     && stanza.attrs.type === 'groupchat'
     && !stanza.attrs.from.endsWith(room_bot_nick)) {
-        console.log(chat_message(stanza));
+        var msg = chat_message(stanza);
+        console.log(msg);
+
+        if (msg.startsWith("/r last")) {
+            send_message('review not found');
+        }
     }
 });
 
