@@ -1,5 +1,6 @@
 const xmpp = require('node-xmpp');
 const util = require('util');
+const market = require('./reviews.js');
 
 jid = 'bot@bot.com';
 password = 'password1';
@@ -67,6 +68,9 @@ function(stanza) {
         console.log(msg);
 
         if (msg.startsWith("/r last")) {
+            market.get_latest_reviews('com.facebook.katana', function(resp) {
+                console.log(resp.headers.location);
+            });
             send_message('review not found');
         }
     }
