@@ -18,7 +18,7 @@ String.prototype.endsWith = function(suffix) {
     return this.indexOf(suffix, this.length - suffix.length) !== -1;
 };
 
-function chat_message(msg){
+function chat_message(msg) {
     return msg.getChild('body').children[0];
 }
 
@@ -32,10 +32,15 @@ function() {
     }).
     c('x', {
         xmlns: 'http://jabber.org/protocol/muc'
+    }).
+    c('history', {
+        //disable history so you don't receive old messages.
+        maxstanzas: 0,
+        seconds: 1
     })
     );
 
-    // bot greets the devs on join.
+    // bot says hello to the chat room.
     conn.send(new xmpp.Element('message', {
         to: room_jid,
         type: 'groupchat'
@@ -44,10 +49,13 @@ function() {
     );
 });
 
+// bind to the stanza event stream, and respond only for message stanzas
 conn.on('stanza',
-function(message) {
-    if (message.attrs.type === 'groupchat' && !message.attrs.from.endsWith(room_bot_nick)) {
-        console.log(chat_message(message));
+function(stanza) {
+    if (stanza.is('message')
+    && stanza.attrs.type === 'groupchat'
+    && !stanza.attrs.from.endsWith(room_bot_nick)) {
+        console.log(chat_message(stanza));
     }
 });
 
