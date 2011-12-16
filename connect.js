@@ -8,25 +8,40 @@ room_nick = 'bot'
 
 // Establish a connection
 var conn = new xmpp.Client({
-    jid         : jid,
-    password    : password,
-    host        : 'localhost',
-    port        : 5222
+    jid: jid,
+    password: password,
+    host: 'localhost',
+    port: 5222
 });
 
 
-conn.on('online', function(){
+conn.on('online',
+function() {
     console.log("ONLINE");
 
-     conn.send(new xmpp.Element('presence', { to: room_jid +'/' + room_nick }).
-             c('x', { xmlns: 'http://jabber.org/protocol/muc' })
-               );
+    conn.send(new xmpp.Element('presence', {
+        to: room_jid + '/' + room_nick
+    }).
+    c('x', {
+        xmlns: 'http://jabber.org/protocol/muc'
+    })
+    );
 
-       conn.send(new xmpp.Element('message', { to: room_jid, type: 'groupchat' }).
-               c('body').t('Hello All...')
-                 );
+    conn.send(new xmpp.Element('message', {
+        to: room_jid,
+        type: 'groupchat'
+    }).
+    c('body').t('Hey, devs...')
+    );
+});
 
+conn.on('stanza', function(message) {    
+    console.log(message.attrs.from);
 });
-conn.on('error', function(e) {
-     console.log(e);
+
+conn.on('error',
+function(e) {
+    console.log(e);
 });
+
+
